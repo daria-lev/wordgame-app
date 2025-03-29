@@ -7,12 +7,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "@popperjs/core"; 
 import "bootstrap";
 import Board from './Board.jsx';
+import Classic from './Classic.jsx'
+import AvgColor from './AvgColor.jsx'
 
 
 
 function App() {
   const [game, setGame] = useState("Start")
-  let gameList = ["Word Distance", "Classic Wordle"]
+  let gameList = ["Word Distance", "Classic Wordle", "Average Color Wordle"]
 
   function renderBody() {
     if (game === "Start") {
@@ -25,7 +27,9 @@ function App() {
       )
     }
     else if (game === "Classic Wordle") {
-      return (<Board></Board>)
+      return (<Classic></Classic>)
+    } else if (game === "Average Color Wordle") {
+      return (<AvgColor></AvgColor>)
     }
     else {
       return (

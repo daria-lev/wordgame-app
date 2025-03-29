@@ -3,24 +3,28 @@ import './App.css'
 import Tile from './LetterTile.jsx'
 import useKeyPress from './useKeyPress.jsx'
 
-function Board() {
+function Board(props) {
   const [completeWords, setComplete] = useState([])
   const [results, setResults] = useState([])
   const [curWord, setWord] = useState([])
+  const [solved, setSolved] = useState(false)
   let len = 5
   let maxTries = 6
   const answer = "catto".toUpperCase()
   const pressed = useKeyPress()
 
   useEffect(() => {
-    if (pressed) {
+    if (pressed && !solved) {
       if (pressed === 'Enter') {
         if (curWord.length === len) {
+          if (wordEqual()) {
+            setSolved(true)
+          }
           let comp = [...completeWords]
           comp.push(curWord)
           setComplete(comp)
           let res = [...results]
-          res.push(getResults(curWord))
+          res.push(props.resultFunc(curWord, answer)) // props.resultFunc
           setResults(res)
           setWord([])
         }
@@ -40,28 +44,13 @@ function Board() {
     }
   }, [pressed]);
 
-  function getResults(word) { //swappable for different versions?
-    let colors = []
+  function wordEqual() {
     for (let i = 0; i < len; i++) {
-      if (word[i] === answer.charAt(i)) {
-        colors.push("green")
-        console.log(word[i] + " matches " + answer.charAt(i))
-      } else if (answer.includes(word[i])) {
-        console.log(answer + " includes " + word[i])
-        let ansCount = 0
-        let tryCount = 0
-        for (let j = 0; j < len; j++) {
-          if (word[j] === word[i]) {tryCount++}
-          if (answer.charAt(j) === word[i]) {ansCount++}
-        }
-        if (tryCount <= ansCount) {colors.push("yellow")}
-        else (colors.push("gray"))
-      } else {
-        console.log(word[i] + " not matches " + answer.charAt(i))
-        colors.push("gray")
+      if (curWord[i] !== answer.charAt(i)) {
+        return false
       }
     }
-    return colors
+    return true
   }
 
 
@@ -98,7 +87,18 @@ function Board() {
     return <div>{tiles}</div>
   }
 
-  return <div>{renderBoard()}</div>
+  function renderDone() {
+    if (solved) {
+      return <p>Congratulations!</p>
+    }
+    if (completeWords.length === maxTries) {
+      const text = "Fail :( the secret word was " + answer + "."
+      return <p>{text}</p>
+    }
+    return <p></p>
+  }
+
+  return <div>{renderBoard()}{renderDone()}</div>
 }
 
 export default Board;
