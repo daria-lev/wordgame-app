@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import Tile from './LetterTile.jsx'
 import useKeyPress from './useKeyPress.jsx'
+import { WORDS } from './words.jsx'
 
 function Board(props) {
   const [completeWords, setComplete] = useState([])
@@ -9,33 +10,43 @@ function Board(props) {
   const [curWord, setWord] = useState([])
   const [solved, setSolved] = useState(false)
   let len = 5
-  let maxTries = 6
-  const answer = "catto".toUpperCase()
+  let maxTries = props.tries
+  const [answer, setAns] = useState(getWord().toUpperCase())
+  const [invalid, setInvalid] = useState(false)
   const pressed = useKeyPress()
+  const buttonRef = useRef(null)
 
   useEffect(() => {
     if (pressed && !solved) {
       if (pressed === 'Enter') {
         if (curWord.length === len) {
-          if (wordEqual()) {
-            setSolved(true)
+          setInvalid(false)
+          let curStr = curWord.join("")
+          if (WORDS.includes(curStr.toLowerCase())) {
+            if (wordEqual()) {
+              setSolved(true)
+            }
+            let comp = [...completeWords]
+            comp.push(curWord)
+            setComplete(comp)
+            let res = [...results]
+            res.push(props.resultFunc(curWord, answer)) // props.resultFunc
+            setResults(res)
+            setWord([])
+          } else {
+            setInvalid(true)
           }
-          let comp = [...completeWords]
-          comp.push(curWord)
-          setComplete(comp)
-          let res = [...results]
-          res.push(props.resultFunc(curWord, answer)) // props.resultFunc
-          setResults(res)
-          setWord([])
         }
       } else if (pressed === 'Backspace') {
         if (curWord.length > 0) {
+          setInvalid(false)
           let word = [...curWord]
           word = word.slice(0, -1)
           setWord(word)
         }
       } else { // letter
         if (curWord.length < len) {
+          setInvalid(false)
           let word = [...curWord]
           word.push(pressed.toUpperCase())
           setWord(word)
@@ -51,6 +62,22 @@ function Board(props) {
       }
     }
     return true
+  }
+
+  function getWord() {
+    let r = Math.floor(Math.random() * WORDS.length)
+    return WORDS[r]
+  }
+
+  function handleReset() {
+    setAns(getWord().toUpperCase())
+    setComplete([])
+    setResults([])
+    setSolved(false)
+    setWord([])
+    if (buttonRef.current) {
+      buttonRef.current.blur();
+    }
   }
 
 
@@ -95,10 +122,17 @@ function Board(props) {
       const text = "Fail :( the secret word was " + answer + "."
       return <p>{text}</p>
     }
+    if (invalid) {
+      return <p>That's not a valid word.</p>
+    }
     return <p></p>
   }
 
-  return <div>{renderBoard()}{renderDone()}</div>
+  return <div>
+    {renderBoard()}
+    {renderDone()}
+    <button onClick={handleReset} ref={buttonRef}>New Game</button>
+  </div>
 }
 
 export default Board;

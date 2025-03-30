@@ -9,7 +9,7 @@ import "bootstrap";
 import Board from './Board.jsx';
 import Classic from './Classic.jsx'
 import AvgColor from './AvgColor.jsx'
-
+import Distance from './Distance.jsx'
 
 
 function App() {
@@ -30,6 +30,8 @@ function App() {
       return (<Classic></Classic>)
     } else if (game === "Average Color Wordle") {
       return (<AvgColor></AvgColor>)
+    } else if (game === "Word Distance") {
+      return (<Distance></Distance>)
     }
     else {
       return (

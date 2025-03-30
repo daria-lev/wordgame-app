@@ -61,7 +61,7 @@ function AvgColor() {
    }
 
   return (
-    <Board resultFunc={getResults}></Board>
+    <Board resultFunc={getResults} tries={8}></Board>
   )
 }
 

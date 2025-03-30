@@ -37,7 +37,7 @@ function Classic() {
   }
 
   return (
-    <Board resultFunc={getResults}></Board>
+    <Board resultFunc={getResults} tries={6}></Board>
   )
 }
 
